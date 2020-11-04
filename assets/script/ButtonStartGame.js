@@ -22,6 +22,7 @@ cc.Class({
                 cc.fadeIn(0,2),
                 cc.callFunc(function () {
                     console.log('切换场景');
+                    cc.director.loadScene('game');
                 },this)
             )
         );
