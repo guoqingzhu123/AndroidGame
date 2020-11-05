@@ -64,8 +64,8 @@ cc.Class({
         }
         this._updatePosition(dt);
         this._updateState(dt);
-        // this.detectCollision();
-        // this.fixBirdFinalPosition();
+        this.detectCollision();
+        this.fixBirdFinalPosition();
     },
     
 
@@ -147,63 +147,62 @@ cc.Class({
         this.nextPipe = this.game.pipeManager.getNext();
     },
 
-    // detectCollision(){
-    //     if(!this.nextPipe){
-    //         this.getNextPipe();
-    //         return;
-    //     }
-    //     if(this.state=== State.Ready || this.state === State.Dead || this.state === State.Drop){
-    //         return;
-    //     }
+    detectCollision(){
+        if(!this.nextPipe){
+            this.getNextPipe();
+            return;
+        }
+        if(this.state=== State.Ready || this.state === State.Dead || this.state === State.Drop){
+            return;
+        }
+        let collideWithPipe = false;
+        //检测小鸟与上方管子的碰撞
+        if(this.detectCollisionWithBird(this.nextPipe.topPipe)){
+            collideWithPipe = true;
+        }
+        //检测小鸟与下方管子的碰撞
+        if(this.detectCollisionWithBird(this.nextPipe.bottomPipe)){
+            collideWithPipe = true;
+        }
+        //检测小鸟与地面的碰撞
+        let collideWithGround = false;
+        if(this.detectCollisionWithBird(this.ground)){
+            collideWithGround = true;
+        }
 
-    //     let collideWithPipe = false;
-    //     //检测小鸟与上方管子的碰撞
-    //     if(this.detectCollisionWithBird(this.nextPipe.topPipe)){
-    //         collideWithPipe = true;
-    //     }
-    //     //检测小鸟与下方管子的碰撞
-    //     if(this.detectCollisionWithBird(this.nextPipe.bottomPipe)){
-    //         collideWithPipe = true;
-    //     }
-    //     //检测小鸟与地面的碰撞
-    //     let collideWithGround = false;
-    //     if(this.detectCollisionWithBird(this.ground)){
-    //         collideWithGround = true;
-    //     }
+        //碰撞结果
+        if(collideWithPipe || collideWithGround){
+            // cc.audioEngine.playEffect(this.hitAudio);
+            if(collideWithGround){   //与地面碰撞
+                this.state = State.Dead;
+            }else{    //与水管碰撞
+                this.state = State.Drop;
+                this.runDropAction();
+                // this.scheduleOnce(()=>{
+                //     cc.audioEngine.playEffect(this.dropAudio)
+                // },0.3);
+            }
 
-    //     //碰撞结果
-    //     if(collideWithPipe || collideWithGround){
-    //         cc.audioEngine.playEffect(this.hitAudio);
-    //         if(collideWithGround){   //与地面碰撞
-    //             this.state = State.Dead;
-    //         }else{    //与水管碰撞
-    //             this.state = State.Drop;
-    //             this.runDropAction();
-    //             this.scheduleOnce(()=>{
-    //                 cc.audioEngine.playEffect(this.dropAudio)
-    //             },0.3);
-    //         }
+            this.anim.stop();
+            this.game.gameOver();
+        }else{
+            let birdLeft = this.node.x;
+            let pipeRight = this.nextPipe.node.x+this.nextPipe.topPipe.width;
+            let crossPipe = birdLeft > pipeRight;
+            if(crossPipe){
+                // this.game.gainScore();
+                this.getNextPipe();
+            }
+        }
+    },
 
-    //         this.anim.stop();
-    //         this.game.gameOver();
-    //     }else{
-    //         let birdLeft = this.node.x;
-    //         let pipeRight = this.nextPipe.node.x+this.nextPipe.topPipe.width;
-    //         let crossPipe = birdLeft > pipeRight;
-    //         if(crossPipe){
-    //             this.game.gainScore();
-    //             this.getNextPipe();
-    //         }
-    //     }
-    // },
-
-    // detectCollisionWithBird(otherNode){
-    //     return cc.rectIntersectsRect(this.node.getBoundingBoxToWorld(),otherNode.getBoundingBoxToWorld());
-    // },
-    // //修正最后落地位置
-    // fixBirdFinalPosition(){
-    //     if(this.detectCollisionWithBird(this.ground)){
-    //         this.node.y = this.ground.y + this.node.width / 2 +120 ;
-    //     }
-    // },
+    detectCollisionWithBird(otherNode){
+        return cc.rectIntersectsRect(this.node.getBoundingBoxToWorld(),otherNode.getBoundingBoxToWorld());
+    },
+    //修正最后落地位置
+    fixBirdFinalPosition(){
+        if(this.detectCollisionWithBird(this.ground)){
+            this.node.y = this.ground.y + this.node.width / 2  ;
+        }
+    },
 });
