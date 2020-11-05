@@ -1,5 +1,6 @@
 
 var Bird = require('Bird');
+var PipeManager = require('PipeManager')
 cc.Class({
     extends: cc.Component,
 
@@ -16,6 +17,7 @@ cc.Class({
         },
 
         bird:Bird,
+        pipeManager:PipeManager,
       
     },
 
@@ -86,7 +88,17 @@ cc.Class({
         this._hideReadyMenu();
         //开始飞行
         this.bird.startFly();
-        // this.pipeManager.startSpawn();
+        this.pipeManager.startSpawn();
+    },
+    //游戏结束
+    gameOver(){
+        this.pipeManager.reset();
+        this._enableInput(false);
+
+        // this.ground.getComponent(Scroller).stopScroll(); //地板停止滚动
+        // this.background.getComponent(Scroller).stopScroll();//背景停止滚动
+        // this.blinkOnce();//闪烁一次
+        // this.showGameOverMenu();//显示游戏结束菜单
     },
     
 });

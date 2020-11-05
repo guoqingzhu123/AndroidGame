@@ -116,9 +116,9 @@ cc.Class({
         // cc.audioEngine.playEffect(this.riseAudio);
     },
 
-    //开始起飞,同时停止birdFlapping的动画，有冲突
+    //开始起飞,同时停止birdFlapping的动画，并且添加管道
     startFly(){
-        // this.getNextPipe();
+        this.getNextPipe();
         this.anim.stop("birdFlapping");
         this.rise();
     },
