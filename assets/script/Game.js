@@ -1,3 +1,5 @@
+
+var Bird = require('Bird');
 cc.Class({
     extends: cc.Component,
 
@@ -12,6 +14,8 @@ cc.Class({
             type: cc.Node,
             default: null
         },
+
+        bird:Bird,
       
     },
 
@@ -19,6 +23,7 @@ cc.Class({
      onLoad () {
         this._revealScene();
         this._enableInput(true);
+        this.bird.init(this);
     },
 
       //场景切换
@@ -57,15 +62,31 @@ cc.Class({
 
       //定义键盘事件 处理函数，鼠标点击事件函数
     onKeyDown(){
-        this._hideReadyMenu();
+        this._startGameOrJumpBird();
     },
     onTouch(){
-        // this._hideReadyMenu();
-        this._hideReadyMenu(); 
+        this._startGameOrJumpBird();
         return true;
     },
 
+     //开始或者飞行
+     _startGameOrJumpBird(){
+        //如果是准备状态则运行开始游戏，否则继续飞行
+        if(this.bird.state === Bird.State.Ready){
+            this._gameStart();
+        }else{
+            //继续飞行
+            this.bird.rise();
+        }
+    },
 
-
+     //游戏开始
+     _gameStart(){
+        //隐藏menu
+        this._hideReadyMenu();
+        //开始飞行
+        this.bird.startFly();
+        // this.pipeManager.startSpawn();
+    },
     
 });
