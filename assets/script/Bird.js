@@ -9,7 +9,7 @@ const State =cc.Enum({
     Drop:-1,
     //坠落地面静止
     Dead:-1,
-});
+})
 
 cc.Class({
     extends: cc.Component,
@@ -29,23 +29,27 @@ cc.Class({
             type:State
         },
 
-        // //小鸟向上飞的声音
-        // riseAudio:{
-        //     default:null,
-        //     url:cc.AudioClip
-        // },
-        // //小鸟碰撞到水管后开始坠落的声音
-        // dropAudio:{
-        //     default:null,
-        //     url:cc.AudioClip
-        // },
-        // //小鸟发生碰撞的声音
-        // hitAudio:{
-        //     default:null,
-        //     url:cc.AudioClip
-        // },
+        //小鸟向上飞的声音
+        riseAudio:{
+            default:null,
+            url:cc.AudioClip
+        },
+        //小鸟碰撞到水管后开始坠落的声音
+        dropAudio:{
+            default:null,
+            url:cc.AudioClip
+        },
+        //小鸟发生碰撞的声音
+        hitAudio:{
+            default:null,
+            url:cc.AudioClip
+        },
       
     },
+
+    // LIFE-CYCLE CALLBACKS:
+
+    // onLoad () {},
 
     start () {
 
@@ -56,7 +60,6 @@ cc.Class({
         this.currentSpeed = 0;  //初始化当前的速度
         this.anim = this.getComponent(cc.Animation);  //获取动画组件
     },
-
     update (dt) {
         //如果是住呢比或者死亡状态则停止计算
         if(this.state === State.Ready || this.state === State.Dead){
@@ -113,10 +116,10 @@ cc.Class({
         //重置速度
         this.currentSpeed = this.initRiseSpeed;
 
-        // cc.audioEngine.playEffect(this.riseAudio);
+        cc.audioEngine.playEffect(this.riseAudio);
     },
 
-    //开始起飞,同时停止birdFlapping的动画，并且添加管道
+    //开始起飞,同时停止birdFlapping的动画，有冲突
     startFly(){
         this.getNextPipe();
         this.anim.stop("birdFlapping");
@@ -130,7 +133,7 @@ cc.Class({
     },
     //下落的角度偏移  下落
     runFallAction(duration = 0.6){
-        // this.node.stopAllActions();
+        this.node.stopAllActions();
         let dropAction = cc.rotateTo(duration,90).easing(cc.easeCubicActionIn());
         this.node.runAction(dropAction);
 
@@ -155,6 +158,7 @@ cc.Class({
         if(this.state=== State.Ready || this.state === State.Dead || this.state === State.Drop){
             return;
         }
+
         let collideWithPipe = false;
         //检测小鸟与上方管子的碰撞
         if(this.detectCollisionWithBird(this.nextPipe.topPipe)){
@@ -172,15 +176,15 @@ cc.Class({
 
         //碰撞结果
         if(collideWithPipe || collideWithGround){
-            // cc.audioEngine.playEffect(this.hitAudio);
+            cc.audioEngine.playEffect(this.hitAudio);
             if(collideWithGround){   //与地面碰撞
                 this.state = State.Dead;
             }else{    //与水管碰撞
                 this.state = State.Drop;
                 this.runDropAction();
-                // this.scheduleOnce(()=>{
-                //     cc.audioEngine.playEffect(this.dropAudio)
-                // },0.3);
+                this.scheduleOnce(()=>{
+                    cc.audioEngine.playEffect(this.dropAudio)
+                },0.3);
             }
 
             this.anim.stop();
@@ -190,7 +194,7 @@ cc.Class({
             let pipeRight = this.nextPipe.node.x+this.nextPipe.topPipe.width;
             let crossPipe = birdLeft > pipeRight;
             if(crossPipe){
-                // this.game.gainScore();
+                this.game.gainScore();
                 this.getNextPipe();
             }
         }
@@ -202,7 +206,7 @@ cc.Class({
     //修正最后落地位置
     fixBirdFinalPosition(){
         if(this.detectCollisionWithBird(this.ground)){
-            this.node.y = this.ground.y + this.node.width / 2  ;
+            this.node.y = this.ground.y + this.node.width / 2 +120 ;
         }
     },
 });

@@ -5,6 +5,11 @@ cc.Class({
         maskLayer : {
             default : null,
             type : cc.Node
+        },
+
+        swooshingAudio: {
+            default : null,
+            url :cc.AudioClip
         }
         
     },
@@ -26,6 +31,7 @@ cc.Class({
                 },this)
             )
         );
+        cc.audioEngine.playEffect(this.swooshingAudio);
     },
 
     start () {
